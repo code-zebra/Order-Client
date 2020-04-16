@@ -9,9 +9,11 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import cn.hainu.Order.R;
 import cn.hainu.Order.Util.ShareUtils;
+import cn.hainu.Order.service.UserService;
 
 /**
  * 系统登录活动
@@ -19,8 +21,8 @@ import cn.hainu.Order.Util.ShareUtils;
 public class LoginActivity extends AppCompatActivity {
     private EditText accountEdit;
     private EditText passwordEdit;
-    private Button btnlogin;
-    private Button btnRegister;
+    private Button btn_login;
+    private Button btn_register;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,38 +34,60 @@ public class LoginActivity extends AppCompatActivity {
 
     //初始化页面控件
     private void initViews() {
-        accountEdit = (EditText) findViewById(R.id.account);
+        accountEdit = (EditText) findViewById(R.id.name);
         passwordEdit = (EditText) findViewById(R.id.password);
-        btnlogin = (Button) findViewById(R.id.login);
-        btnRegister=(Button) findViewById(R.id.register);
+        btn_login = (Button) findViewById(R.id.login);
+        btn_register=(Button) findViewById(R.id.register);
     }
 
     //初始化控件事件
     private void initEvents() {
         //给登录按钮设置点击事件
-        btnlogin.setOnClickListener(new View.OnClickListener() {
+        btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String account = accountEdit.getText().toString();
+                String name = accountEdit.getText().toString();
                 String password = passwordEdit.getText().toString();
-                //判断用户名和密码是否正确
-                if (!TextUtils.isEmpty(account) && !TextUtils.isEmpty(password)) { //用户名和密码都不为空
+                /*//判断用户名和密码是否正确
+                if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(password)) { //用户名和密码都不为空
                     //尝试登陆
-                    tryToLogin(account, password);
+                    tryToLogin(name, password);
                 }else{
                     showDialog("用户名或密码不能为空！");
+                }*/
+
+                if (UserService.login(name,password)) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                            //登录成功，跳转到菜单展示的主页面
+                            Intent intent = new Intent(LoginActivity.this, OrderActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                }
+                else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showDialog("用户名称或者密码错误，请重新输入！");
+                        }
+                    });
                 }
 
             }
         });
 
         //给注册按钮设置点击事件
-        btnRegister.setOnClickListener(new View.OnClickListener() {
+        btn_register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //跳转到注册界面
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-                LoginActivity.this.finish(); //结束当前界面
+                //结束当前界面
+                LoginActivity.this.finish();
             }
         });
     }

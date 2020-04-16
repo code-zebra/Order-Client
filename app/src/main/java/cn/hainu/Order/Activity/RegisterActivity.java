@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import cn.hainu.Order.R;
 import cn.hainu.Order.Util.ShareUtils;
+import cn.hainu.Order.service.UserService;
 
 /**
  * 注册活动
@@ -64,40 +65,55 @@ public class RegisterActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //获取用户名输入框中的内容
-                String username = etUsername.getText().toString();
+                String name = etUsername.getText().toString();
                 //获取密码输入框中的内容
                 String password = etPassword.getText().toString();
                 //获取再次输入密码输入框中的内容
                 String passAgain = etPassAgain.getText().toString();
 
                 //判断用户名和密码是否正确
-                if (!TextUtils.isEmpty(username)
+                if (!TextUtils.isEmpty(name)
                         && !TextUtils.isEmpty(password)
                         && !TextUtils.isEmpty(passAgain)
-                        && password.equals(passAgain)) { //用户名和密码都不为空且两次密码相同
-
+                        && password.equals(passAgain)) {
+                    //用户名和密码都不为空且两次密码相同
                     hideNameAndPassError(); //隐藏用户名和密码错误提示
-                    tryToRegister(username, password); //尝试登陆
+                    register(name, password); //尝试登陆
 
-                } else { //用户名或密码为空或两次密码不同
-                    showNameOrPassError(username, password, passAgain); //显示用户名或密码错误文字提示
+                } else {
+                    //用户名或密码为空或两次密码不同
+                    showNameOrPassError(name, password, passAgain); //显示用户名或密码错误文字提示
                 }
             }
         });
     }
 
-    //隐藏用户名和密码错误提示
-    private void hideNameAndPassError() {
-        tvNameWrong.setVisibility(View.INVISIBLE); //隐藏用户名不能为空提示文字
-        tvPssWrong.setVisibility(View.INVISIBLE); //隐藏不能为空提示文字
-        tvPssNotMatch.setVisibility(View.INVISIBLE); //隐藏两次密码不一致提示文字
+    private void register(String name, String password) {
+        if (UserService.register(name, password))
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                    finish();
+                }
+            });
+        else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
-    //尝试登陆
+/*    //尝试登陆
     private void tryToRegister(String username, String password) {
         //获取数据库中该用户名对应的密码
         String realPassword = ShareUtils.getString(this, username, "");
-        if ("".equals(realPassword)) { //数据库中没有该用户名的数据
+        if ("".equals(realPassword)) {
+            //数据库中没有该用户名的数据
             //保存用户名和密码到数据库中
             ShareUtils.putString(this, username, password);
             Toast.makeText(this, "成功注册用户：" + username, Toast.LENGTH_SHORT).show();
@@ -108,7 +124,16 @@ public class RegisterActivity extends Activity {
             //提示用户名已存在
             Toast.makeText(this, "用户名已存在", Toast.LENGTH_SHORT).show();
         }
+    }*/
+
+    //隐藏用户名和密码错误提示
+    private void hideNameAndPassError() {
+        tvNameWrong.setVisibility(View.INVISIBLE); //隐藏用户名不能为空提示文字
+        tvPssWrong.setVisibility(View.INVISIBLE); //隐藏不能为空提示文字
+        tvPssNotMatch.setVisibility(View.INVISIBLE); //隐藏两次密码不一致提示文字
     }
+
+
 
     /**
      * 显示用户名或密码错误文字提示
