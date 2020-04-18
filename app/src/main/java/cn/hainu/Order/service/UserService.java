@@ -1,26 +1,41 @@
 package cn.hainu.Order.service;
 
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
 
 public class UserService {
 
+//    static String localhost = "10.217.192.49";
+    // 模拟器把自己当成了localhost,以及127.0.0.1了，因此如果基于本地的web项目测试的话，必须修改IP为：10.0.2.2
+    static String localhost = "10.0.2.2";
+    static String resp_json;
+    // 是否成功
+    boolean result;
     public static boolean login(String name, String password) {
-        MyThread myThread = new MyThread("http://10.217.192.49:8080/service/login",
+        LoginThread loginThread = new LoginThread("http://" + localhost + ":8080/service/login",
                 name, password);
         try {
-            myThread.start();
-            myThread.join();
+            loginThread.start();
+            loginThread.join();
+            resp_json = loginThread.getResp_json();
+            System.out.println("UserService : " + resp_json);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return myThread.getResult();
+        return loginThread.getResult();
     }
 
     public static boolean register(String name, String password) {
-        MyThread myThread = new MyThread("http://10.217.192.49:8080/service/register",
+        MyThread myThread = new MyThread("http://" + localhost + ":8080/service/register",
                 name, password);
         try {
             myThread.start();
@@ -30,46 +45,21 @@ public class UserService {
         }
         return myThread.getResult();
     }
-}
 
-class MyThread extends Thread
-{
-    private String path;
-    private String name;
-    private String password;
-    private boolean result = false;
-
-    public MyThread(String path, String name, String password)
-    {
-        this.path = path;
-        this.name = name;
-        this.password = password;
-    }
-
-    @Override
-    public void run()
-    {
+    public static boolean setting(String username, int money, String name, String phone, String email) {
+        SettingThread settingThread = new SettingThread("http://" + localhost + ":8080/service/editInfo",
+                username, money, name, phone, email);
         try {
-            URL url = new URL(path);
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setConnectTimeout(3000);//设置连接超时时间
-            httpURLConnection.setReadTimeout(3000);//设置读取超时时间
-            httpURLConnection.setRequestMethod("POST");//设置请求方法,post
-
-            String data = "name=" + URLEncoder.encode(name, "utf-8") + "&password=" + URLEncoder.encode(password, "utf-8");//设置数据
-            httpURLConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");//设置响应类型
-            httpURLConnection.setRequestProperty("Content-Length", data.length() + "");//设置内容长度
-            httpURLConnection.setDoOutput(true);//允许输出
-            OutputStream outputStream = httpURLConnection.getOutputStream();
-            outputStream.write(data.getBytes("utf-8"));//写入数据
-            result = (httpURLConnection.getResponseCode() == 200);
-        } catch (Exception e) {
+            settingThread.start();
+            settingThread.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return settingThread.getResult();
     }
 
-    public boolean getResult()
-    {
-        return result;
+    public static String getResp_json() {
+        return resp_json;
     }
 }
+

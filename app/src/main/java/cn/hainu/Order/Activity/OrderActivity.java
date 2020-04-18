@@ -106,7 +106,7 @@ public class OrderActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter = new FoodAdapter(foodList);
         recyclerView.setAdapter(adapter);
-        //刷新菜单的控件逻辑
+/*        //刷新菜单的控件逻辑
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -114,7 +114,7 @@ public class OrderActivity extends AppCompatActivity {
             public void onRefresh() {
                 refreshfoods();
             }
-        });
+        });*/
     }
 
     /**

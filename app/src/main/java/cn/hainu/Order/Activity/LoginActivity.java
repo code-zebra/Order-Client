@@ -5,15 +5,27 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import android.text.TextUtils;
+
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+
 import cn.hainu.Order.R;
+import cn.hainu.Order.Util.HttpUtil;
 import cn.hainu.Order.Util.ShareUtils;
+import cn.hainu.Order.service.LoginThread;
 import cn.hainu.Order.service.UserService;
+
+import static android.media.AudioRecord.SUCCESS;
 
 /**
  * 系统登录活动
@@ -21,8 +33,14 @@ import cn.hainu.Order.service.UserService;
 public class LoginActivity extends AppCompatActivity {
     private EditText accountEdit;
     private EditText passwordEdit;
+
     private Button btn_login;
     private Button btn_register;
+
+    public static String et_name;
+    public static String et_phone;
+    public static String et_email;
+    public static int et_money;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +52,11 @@ public class LoginActivity extends AppCompatActivity {
 
     //初始化页面控件
     private void initViews() {
-        accountEdit = (EditText) findViewById(R.id.name);
-        passwordEdit = (EditText) findViewById(R.id.password);
-        btn_login = (Button) findViewById(R.id.login);
-        btn_register=(Button) findViewById(R.id.register);
+        accountEdit = findViewById(R.id.name);
+        passwordEdit = findViewById(R.id.password);
+
+        btn_login = findViewById(R.id.login);
+        btn_register = findViewById(R.id.register);
     }
 
     //初始化控件事件
@@ -46,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String name = accountEdit.getText().toString();
+                final String name = accountEdit.getText().toString();
                 String password = passwordEdit.getText().toString();
                 /*//判断用户名和密码是否正确
                 if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(password)) { //用户名和密码都不为空
@@ -61,6 +80,12 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                            ShareUtils.setUsername(name);
+                            // 根据获取response的JSON格式的数据，设置个人信息和钱包信息
+                            String json = UserService.getResp_json();
+                            System.out.println("LoginActivity :   " + json);
+                            JSONAnalysis(json);
+
                             //登录成功，跳转到菜单展示的主页面
                             Intent intent = new Intent(LoginActivity.this, OrderActivity.class);
                             startActivity(intent);
@@ -92,29 +117,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 进行登录请求的数据库查询
-     * @param username 用户名
-     * @param password 密码
-     */
-    private void tryToLogin(String username, String password) {
-        //获取数据库中该用户名对应的密码
-        String realPassword = ShareUtils.getString(this, username, "");
-        //对数据库查询结果进行判断和处理
-        if (password.equals(realPassword)) {
-            //给用户的钱包余额设定金额
-            ShareUtils.putInt(this, "money", 300);
-            ShareUtils.putString(this, "user_true_name", "黄杰峰");
-            ShareUtils.putString(this, "user_true_phone", "12345678910");
-            ShareUtils.putString(this, "user_true_mail",  "123456789@qq.com");
-            //登录成功，跳转到菜单展示的主页面
-            Intent intent = new Intent(LoginActivity.this, OrderActivity.class);
-            startActivity(intent);
-            finish();
-        } else {
-            showDialog("用户名称或者密码错误，请重新输入！");
-        }
-    }
 
     /**
      * 为了方便，定义一个弹框控件的函数
@@ -131,4 +133,35 @@ public class LoginActivity extends AppCompatActivity {
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+    /**
+     * JSON解析方法Test
+     */
+    protected void JSONAnalysis(String string) {
+        JSONObject object = null;
+        try {
+            object = new JSONObject(string);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        /**
+         * 在你获取的string这个JSON对象中，提取你所需要的信息。
+         */
+        String name = object.optString("name");
+        String phone = object.optString("phone");
+        String email = object.optString("email");
+        int money = object.optInt("money");
+
+        System.out.println("name: " + name);
+        System.out.println("phone: " + phone);
+        System.out.println("email: " + email);
+        System.out.println("money: " + money);
+
+        ShareUtils.setEt_money(money);
+        ShareUtils.setEt_email(email);
+        ShareUtils.setEt_name(name);
+        ShareUtils.setEt_phone(phone);
+    }
+
+
 }

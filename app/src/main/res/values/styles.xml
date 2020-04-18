@@ -12,4 +12,8 @@
     <style name="foodActivityTheme" parent="AppTheme">
     </style>
 
+    <style name="orderActivityTheme" parent="Theme.AppCompat.Light">
+        <item name="android:homeAsUpIndicator">@drawable/menu</item> <!--返回icon-->
+    </style>
+
 </resources>

@@ -80,14 +80,14 @@ public class SuccessActivity extends Activity{
                 if(ispay){
                     showDialog("该订单您已支付过啦！");
                 }else{
-                    int myMoney= ShareUtils.getInt(SuccessActivity.this,"money",1);
+                    int myMoney= ShareUtils.getEt_money();
                     if(totalPrice>myMoney){
                         //当账户余额的钱不足以支付当前订单时
                         showDialogNoMoney();
                     }else{
                         myMoney-=totalPrice;
                         //更新账户余额
-                        ShareUtils.putInt(SuccessActivity.this,"money",myMoney);
+                        ShareUtils.setEt_money(myMoney);
                         //将订单标记为“已结账”,并将结账按钮设置为不可见状态
                         ispay=true;
                         btnPay.setVisibility(View.INVISIBLE);

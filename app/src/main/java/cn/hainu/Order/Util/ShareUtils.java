@@ -8,43 +8,55 @@ import android.view.View;
  * SharedPreferences工具类
  */
 public class ShareUtils {
-    public static final String NAME = "config";
 
-    /**
-     * 存入字符串
-     * @param mContext 上下文
-     * @param key 关键字
-     * @param value 传入的值
-     */
-    public static void putString(Context mContext, String key, String value) {
-        getSP(mContext).edit().putString(key, value).commit();
+    private static String username;
+
+
+
+    private static String et_name;
+    private static String et_phone;
+    private static String et_email;
+    private static int et_money;
+
+    public static String getUsername() {
+        return username;
     }
 
-    public static void putInt(Context mContext, String key, int value) {
-        getSP(mContext).edit().putInt(key,value).commit();
+    public static void setUsername(String username) {
+        ShareUtils.username = username;
+    }
+
+    public static String getEt_name() {
+        return et_name;
+    }
+
+    public static void setEt_name(String et_name) {
+        ShareUtils.et_name = et_name;
+    }
+
+    public static String getEt_phone() {
+        return et_phone;
+    }
+
+    public static void setEt_phone(String et_phone) {
+        ShareUtils.et_phone = et_phone;
+    }
+
+    public static String getEt_email() {
+        return et_email;
+    }
+
+    public static void setEt_email(String et_email) {
+        ShareUtils.et_email = et_email;
+    }
+
+    public static int getEt_money() {
+        return et_money;
+    }
+
+    public static void setEt_money(int et_money) {
+        ShareUtils.et_money = et_money;
     }
 
 
-    /**
-     * 获取字符串
-     * @param mContext 上下文
-     * @param key 关键字
-     * @param defValue 默认返回值
-     */
-    public static String getString(Context mContext, String key, String defValue) {
-        return getSP(mContext).getString(key, defValue);
-    }
-
-    public static int getInt(Context mContext, String key, int defValue) {
-        return getSP(mContext).getInt(key, defValue);
-    }
-
-    /**
-     * 返回一个根据上下文生成的SharedPreferences
-     * @param mContext 上下文
-     * @return 根据上下文生成的SharedPreferences
-     */
-    private static SharedPreferences getSP(Context mContext) {
-        return mContext.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-    }
 }

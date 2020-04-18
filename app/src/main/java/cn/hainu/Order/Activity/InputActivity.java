@@ -37,8 +37,8 @@ public class InputActivity extends Activity {
         Intent otherIntent = getIntent(); //获取信息输入界面传来的意图
         selectedProducts = otherIntent.getParcelableArrayListExtra("selectedProducts"); //从意图中获取被选择的的商品数据
         etPhone.setSelection(etPhone.getText().length()); //将光标移动到电话输入框最后面
-        etname.setText(ShareUtils.getString(InputActivity.this,"user_true_name",""));//从本地读取客户姓名
-        etPhone.setText(ShareUtils.getString(InputActivity.this,"user_true_phone",""));//从本地读取客户电话
+        etname.setText(ShareUtils.getEt_name());//从本地读取客户姓名
+        etPhone.setText(ShareUtils.getEt_phone());//从本地读取客户电话
         //给输入完成按钮设置点击事件
         btnInputCompleted.setOnClickListener(new View.OnClickListener() {
             @Override
